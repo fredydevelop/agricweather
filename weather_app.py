@@ -135,34 +135,34 @@ def next_day_prediction():
 
             prediction = rf_model.predict(input_df)[0]
 
-        else:
-            st.warning(
+    else:
+        st.warning(
                 
-                "An error occured try again later"
-            )
-            return
+             "An error occured try again later"
+         )
+        return
 
-        pred_temp = prediction[0]
-        pred_humidity = prediction[1]
-        pred_wind = prediction[2]
-        pred_pressure = prediction[3]
+    pred_temp = prediction[0]
+    pred_humidity = prediction[1]
+    pred_wind = prediction[2]
+    pred_pressure = prediction[3]
 
-        st.success("Next-Day Weather Prediction Completed")
+    st.success("Next-Day Weather Prediction Completed")
 
-        result_df = pd.DataFrame({
+    result_df = pd.DataFrame({
             "Predicted Temperature (°C)": [round(pred_temp, 2)],
             "Predicted Humidity (%)": [round(pred_humidity, 2)],
             "Predicted Wind Speed": [round(pred_wind, 2)],
             "Predicted Pressure": [round(pred_pressure, 2)]
         })
 
-        st.dataframe(result_df)
+    st.dataframe(result_df)
 
-        st.subheader("Agricultural Recommendations")
-        for i, advice in enumerate(
-            agricultural_advice(pred_temp, pred_humidity, pred_wind, pred_pressure), 1
-        ):
-            st.write(f"{i}. {advice}")
+    st.subheader("Agricultural Recommendations")
+    for i, advice in enumerate(
+        agricultural_advice(pred_temp, pred_humidity, pred_wind, pred_pressure), 1
+    ):
+        st.write(f"{i}. {advice}")
 
 
 # ============================================================
