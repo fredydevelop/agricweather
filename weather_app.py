@@ -20,13 +20,6 @@ st.set_page_config(
 
 st.title("🌦️ Agricultural Weather Prediction System")
 
-selection = option_menu(
-    menu_title=None,
-    options=["Next Day Prediction"],
-    icons=["cloud-sun"],
-    default_index=0,
-    orientation="horizontal"
-)
 
 
 # ============================================================
