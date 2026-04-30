@@ -1,12 +1,10 @@
 # ============================================================
-# WEATHER PREDICTION STREAMLIT APP - NEXT DAY ONLY
+# WEATHER PREDICTION STREAMLIT APP
 # ============================================================
 
 import streamlit as st
 import pandas as pd
 import pickle as pk
-from tensorflow.keras.models import load_model
-from streamlit_option_menu import option_menu
 
 
 # ============================================================
@@ -21,7 +19,6 @@ st.set_page_config(
 st.title("🌦️ Agricultural Weather Prediction System")
 
 
-
 # ============================================================
 # MODEL LOADING
 # ============================================================
@@ -29,17 +26,6 @@ st.title("🌦️ Agricultural Weather Prediction System")
 @st.cache_resource
 def load_rf_nextday_model():
     with open("rf_weather_model_nextday.pkl", "rb") as f:
-        return pk.load(f)
-
-
-@st.cache_resource
-def load_lstm_nextday_model():
-    return load_model("best_lstm_weather_model.keras")
-
-
-@st.cache_resource
-def load_lstm_scaler():
-    with open("lstm_scaler.pkl", "rb") as f:
         return pk.load(f)
 
 
@@ -104,8 +90,6 @@ def create_rf_input(date, meantemp, humidity, wind_speed, meanpressure):
 
 def next_day_prediction():
     st.header("Next-Day Weather Prediction")
-
-
     st.subheader("Enter Current Weather Conditions")
 
     date = st.date_input("Date")
@@ -115,7 +99,7 @@ def next_day_prediction():
     meanpressure = st.number_input("Mean Pressure", value=1010.00)
 
     if st.button("Predict Next Day Weather"):
-
+        try:
             rf_model = load_rf_nextday_model()
 
             input_df = create_rf_input(
@@ -128,39 +112,35 @@ def next_day_prediction():
 
             prediction = rf_model.predict(input_df)[0]
 
-    else:
-        st.warning(
-                
-             "An error occured try again later"
-         )
-        return
+            pred_temp = prediction[0]
+            pred_humidity = prediction[1]
+            pred_wind = prediction[2]
+            pred_pressure = prediction[3]
 
-    pred_temp = prediction[0]
-    pred_humidity = prediction[1]
-    pred_wind = prediction[2]
-    pred_pressure = prediction[3]
+            st.success("Next-Day Weather Prediction Completed")
 
-    st.success("Next-Day Weather Prediction Completed")
+            result_df = pd.DataFrame({
+                "Predicted Temperature (°C)": [round(pred_temp, 2)],
+                "Predicted Humidity (%)": [round(pred_humidity, 2)],
+                "Predicted Wind Speed": [round(pred_wind, 2)],
+                "Predicted Pressure": [round(pred_pressure, 2)]
+            })
 
-    result_df = pd.DataFrame({
-            "Predicted Temperature (°C)": [round(pred_temp, 2)],
-            "Predicted Humidity (%)": [round(pred_humidity, 2)],
-            "Predicted Wind Speed": [round(pred_wind, 2)],
-            "Predicted Pressure": [round(pred_pressure, 2)]
-        })
+            st.dataframe(result_df)
 
-    st.dataframe(result_df)
+            st.subheader("Agricultural Recommendations")
 
-    st.subheader("Agricultural Recommendations")
-    for i, advice in enumerate(
-        agricultural_advice(pred_temp, pred_humidity, pred_wind, pred_pressure), 1
-    ):
-        st.write(f"{i}. {advice}")
+            for i, advice in enumerate(
+                agricultural_advice(pred_temp, pred_humidity, pred_wind, pred_pressure), 1
+            ):
+                st.write(f"{i}. {advice}")
+
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
 
 
 # ============================================================
-# APP ROUTING
+# RUN APP DIRECTLY
 # ============================================================
 
-if selection == "Next Day Prediction":
-    next_day_prediction()
+next_day_prediction()
