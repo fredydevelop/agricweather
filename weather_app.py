@@ -93,12 +93,37 @@ def next_day_prediction():
     st.subheader("Enter Current Weather Conditions")
 
     date = st.date_input("Date")
-    meantemp = st.number_input("Mean Temperature (°C)", value=25.00)
-    humidity = st.number_input("Humidity (%)", value=60.00)
-    wind_speed = st.number_input("Wind Speed", value=5.00)
-    meanpressure = st.number_input("Mean Pressure", value=1010.00)
+
+    meantemp = st.number_input(
+        "Mean Temperature (°C)",
+        value=0.0,
+        step=0.1
+    )
+
+    humidity = st.number_input(
+        "Humidity (%)",
+        value=0.0,
+        step=0.1
+    )
+
+    wind_speed = st.number_input(
+        "Wind Speed",
+        value=0.0,
+        step=0.1
+    )
+
+    meanpressure = st.number_input(
+        "Mean Pressure",
+        value=0.0,
+        step=0.1
+    )
 
     if st.button("Predict Next Day Weather"):
+
+        if meantemp == 0 or humidity == 0 or wind_speed == 0 or meanpressure == 0:
+            st.warning("Please enter valid weather values before prediction.")
+            return
+
         try:
             rf_model = load_rf_nextday_model()
 
@@ -131,7 +156,13 @@ def next_day_prediction():
             st.subheader("Agricultural Recommendations")
 
             for i, advice in enumerate(
-                agricultural_advice(pred_temp, pred_humidity, pred_wind, pred_pressure), 1
+                agricultural_advice(
+                    pred_temp,
+                    pred_humidity,
+                    pred_wind,
+                    pred_pressure
+                ),
+                1
             ):
                 st.write(f"{i}. {advice}")
 
